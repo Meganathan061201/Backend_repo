@@ -1,0 +1,202 @@
+{
+  "info": {
+    "_postman_id": "backend-upload-api-collection",
+    "name": "Backend File Upload API",
+    "description": "Multer + Sharp uploads.\n\n**Images:** `/api/upload/single`, `/api/upload/multiple` — key `image` / `images`\n**Documents:** `/api/upload/file/single`, `/api/upload/file/multiple` — key `file` / `files`\n\nSee `FILE-UPLOAD-POSTMAN.md` for full guide.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "uploadedFilename", "value": "" },
+    { "key": "uploadedFileUrl", "value": "" },
+    { "key": "uploadedDocFilename", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Images",
+      "item": [
+        {
+          "name": "Upload Single Image",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.file?.filename) {",
+                  "        pm.collectionVariables.set('uploadedFilename', json.file.filename);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "image", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/api/upload/single",
+            "description": "Key: `image` | Type: File | JPEG, PNG, WebP | Max 5 MB"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Multiple Images",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "images", "type": "file", "src": [] },
+                { "key": "images", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/api/upload/multiple",
+            "description": "Key: `images` | Max 5 files | Processed with Sharp"
+          },
+          "response": []
+        },
+        {
+          "name": "View Uploaded Image",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/uploads/{{uploadedFilename}}",
+            "description": "Run Upload Single Image first — filename auto-saved."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Documents & Other Files",
+      "item": [
+        {
+          "name": "Upload Single File",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.file?.filename) {",
+                  "        pm.collectionVariables.set('uploadedDocFilename', json.file.filename);",
+                  "        pm.collectionVariables.set('uploadedFileUrl', json.file.viewUrl || json.file.url);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/api/upload/file/single",
+            "description": "Key: `file` | Type: File\n\nAllowed: PDF, TXT, CSV, DOC, DOCX, XLS, XLSX, ZIP | Max 10 MB\n\nNo Sharp processing — stored as-is in uploads/documents/"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Multiple Files",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "files", "type": "file", "src": [] },
+                { "key": "files", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/api/upload/file/multiple",
+            "description": "Key: `files` | Max 5 files"
+          },
+          "response": []
+        },
+        {
+          "name": "View Document (inline)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/upload/file/{{uploadedDocFilename}}",
+            "description": "View PDF/TXT/CSV in Postman or browser.\n\nRun **Upload Single File** first — filename auto-saved to {{uploadedDocFilename}}.\n\nPostman: response shows file content (PDF preview in Postman)."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Document",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/upload/file/{{uploadedDocFilename}}?download=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "upload", "file", "{{uploadedDocFilename}}"],
+              "query": [{ "key": "download", "value": "true" }]
+            },
+            "description": "Force download for any file type (DOC, XLS, ZIP, PDF)."
+          },
+          "response": []
+        },
+        {
+          "name": "View Document (static URL)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/uploads/documents/{{uploadedDocFilename}}",
+            "description": "Alternative: direct static file URL. Same file, no API wrapper."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Error Demos",
+      "item": [
+        {
+          "name": "Wrong Image Field (400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "wrong_name", "type": "file", "src": [] }]
+            },
+            "url": "{{baseUrl}}/api/upload/single"
+          },
+          "response": []
+        },
+        {
+          "name": "PDF on Image Route (400)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "image", "type": "file", "src": [] }]
+            },
+            "url": "{{baseUrl}}/api/upload/single",
+            "description": "Select a PDF — rejected. Use /file/single for documents."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
