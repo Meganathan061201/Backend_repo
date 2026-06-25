@@ -11,3 +11,7 @@ git pull -u origin <Branchname>
 git branch 
 git branch -r
 git branch -a
+git reset --soft HEAD~1
+git revert <ID>
+git fetch --all
+
