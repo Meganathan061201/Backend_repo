@@ -1,0 +1,17 @@
+git init
+git clone <Repo URL>
+git add .
+git add <filename>
+git commit -m "CMD"
+git checkout -b <New Branch Name>
+git checkout <Banchname>
+git status
+git push -u origin <Branchname>
+git pull -u origin <Branchname>
+git branch 
+git branch -r
+git branch -a
+git reset --soft HEAD~1
+git revert <ID>
+git fetch --all
+
