@@ -10,7 +10,3 @@
 // const Project = mongoose.model("Project", projectSchema);
 
 // module.exports = Project;
-
-// git add .
-// git commit -m "add project model"
-// git push origin main

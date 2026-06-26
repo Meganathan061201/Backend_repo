@@ -8,9 +8,6 @@ const connectDB = async () => {
     console.error("MongoDB Connection Error:", error.message);
     process.exit(1);
   }
-  finally{
-    console.log("MongoDB Connection Closed");
-  }
 };
 console.log("test")
 
